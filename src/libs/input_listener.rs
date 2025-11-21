@@ -185,6 +185,18 @@ pub fn start_unified_input_listener(
                         // println!("⌨️ Key Pressed: {}", key_code);
                         // println!("🔍 DEBUG: Key event detected: {}", key_code);
 
+                        // DEAD KEYS FILTER: Ignore dead keys to allow OS composition (accents, etc)
+                        // Dead keys are keys that don't produce immediate output but wait for next key
+                        // Common dead keys: BackQuote (`), Quote ('), Backslash (\) when used for accents
+                        // This allows typing â, ê, ô, ã, õ, etc. naturally
+                        match key_code {
+                            "Backquote" | "Quote" | "Backslash" => {
+                                // Skip dead key events - let OS handle accent composition
+                                return;
+                            }
+                            _ => {}
+                        }
+
                         // Track modifier keys for hotkey detection
                         match key_code {
                             "ControlLeft" | "ControlRight" => {
@@ -232,6 +244,14 @@ pub fn start_unified_input_listener(
                     let key_code = map_key_to_code(key);
                     if !key_code.is_empty() {
                         // println!("⌨️ Key Released: {}", key_code);
+
+                        // DEAD KEYS FILTER: Also ignore dead key releases
+                        match key_code {
+                            "Backquote" | "Quote" | "Backslash" => {
+                                return;
+                            }
+                            _ => {}
+                        }
 
                         // Track modifier key releases for hotkey detection
                         match key_code {
